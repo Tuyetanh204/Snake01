@@ -10,83 +10,88 @@ import android.widget.ImageButton;
 import androidx.appcompat.app.AppCompatActivity;
 
 public class PlayActivity extends AppCompatActivity {
-        private GameView gameView;
+    private GameView gameView;
+    private String speed;
 
-        @Override
-        protected void onCreate(Bundle savedInstanceState) {
-            super.onCreate(savedInstanceState);
-            setContentView(R.layout.activity_play);
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_play);
 
-            gameView = findViewById(R.id.gameView);
+        Intent intent = getIntent();
+        speed = intent.getStringExtra("speed");
 
-            // Gán chức năng cho các nút điều khiển rắn
-            ImageButton btnUp = findViewById(R.id.btnUp);
-            ImageButton btnDown = findViewById(R.id.btnDown);
-            ImageButton btnLeft = findViewById(R.id.btnLeft);
-            ImageButton btnRight = findViewById(R.id.btnRight);
+        gameView = findViewById(R.id.gameView);
+        gameView.setSpeed(speed);
 
-            btnUp.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    gameView.setDirection(1);
-                }
-            });
+        // Gán chức năng cho các nút điều khiển rắn
+        ImageButton btnUp = findViewById(R.id.btnUp);
+        ImageButton btnDown = findViewById(R.id.btnDown);
+        ImageButton btnLeft = findViewById(R.id.btnLeft);
+        ImageButton btnRight = findViewById(R.id.btnRight);
 
-            btnDown.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    gameView.setDirection(3);
-                }
-            });
+        btnUp.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                gameView.setDirection(1);
+            }
+        });
 
-            btnLeft.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    gameView.setDirection(4);
-                }
-            });
+        btnDown.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                gameView.setDirection(3);
+            }
+        });
 
-            btnRight.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    gameView.setDirection(2);
-                }
-            });
-        }
+        btnLeft.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                gameView.setDirection(4);
+            }
+        });
 
-        @Override
-        protected void onResume() {
-            super.onResume();
-            gameView.resume();
-        }
-
-        @Override
-        protected void onPause() {
-            super.onPause();
-            gameView.pause();
-        }
-
-        public void showGameOverDialog(int score) {
-            new AlertDialog.Builder(this)
-                    .setTitle("Game Over")
-                    .setMessage("Score: " + score)
-                    .setPositiveButton("Replay", new DialogInterface.OnClickListener() {
-                        public void onClick(DialogInterface dialog, int which) {
-                            // Reset and restart the game
-                            gameView.resetGame();
-                            gameView.resume();
-                        }
-                    })
-                    .setNegativeButton("Exit to Main Menu", new DialogInterface.OnClickListener() {
-                        public void onClick(DialogInterface dialog, int which) {
-                            // Exit to main menu
-                            Intent intent = new Intent(PlayActivity.this, MainActivity.class);
-                            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
-                            startActivity(intent);
-                            finish();
-                        }
-                    })
-                    .setIcon(android.R.drawable.ic_dialog_alert)
-                    .show();
-        }
+        btnRight.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                gameView.setDirection(2);
+            }
+        });
     }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        gameView.resume();
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        gameView.pause();
+    }
+
+    public void showGameOverDialog(int score) {
+        new AlertDialog.Builder(this)
+                .setTitle("Game Over")
+                .setMessage("Score: " + score)
+                .setPositiveButton("Replay", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        // Reset and restart the game
+                        gameView.resetGame();
+                        gameView.resume();
+                    }
+                })
+                .setNegativeButton("Exit to Main Menu", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        // Exit to main menu
+                        Intent intent = new Intent(PlayActivity.this, MainActivity.class);
+                        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+                        startActivity(intent);
+                        finish();
+                    }
+                })
+                .setIcon(android.R.drawable.ic_dialog_alert)
+                .show();
+    }
+}

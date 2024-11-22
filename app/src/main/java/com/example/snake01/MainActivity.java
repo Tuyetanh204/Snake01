@@ -10,20 +10,33 @@ import android.widget.Button;
 import androidx.appcompat.app.AppCompatActivity;
 
 public class MainActivity extends AppCompatActivity {
+    private static final int SPEED_REQUEST_CODE = 1;
+    private String selectedSpeed = "medium"; // Default speed
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-//button Play
+
         Button playButton = findViewById(R.id.Play);
         playButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(MainActivity.this, PlayActivity.class);
+                intent.putExtra("speed", selectedSpeed);
                 startActivity(intent);
             }
         });
-//button Exit
+
+        Button speedButton = findViewById(R.id.Speed);
+        speedButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(MainActivity.this, SpeedActivity.class);
+                startActivityForResult(intent, SPEED_REQUEST_CODE);
+            }
+        });
+
         Button exitButton = findViewById(R.id.Exit);
         exitButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -32,7 +45,15 @@ public class MainActivity extends AppCompatActivity {
             }
         });
     }
-// Ho tro
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == SPEED_REQUEST_CODE && resultCode == RESULT_OK) {
+            selectedSpeed = data.getStringExtra("speed");
+        }
+    }
+
     private void showExitConfirmationDialog() {
         new AlertDialog.Builder(this)
                 .setTitle("Exit App")
@@ -47,4 +68,3 @@ public class MainActivity extends AppCompatActivity {
                 .show();
     }
 }
-
