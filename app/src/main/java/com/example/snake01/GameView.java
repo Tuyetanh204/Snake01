@@ -7,6 +7,7 @@ import android.graphics.Paint;
 import android.util.AttributeSet;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.Random;
@@ -21,6 +22,7 @@ public class GameView extends SurfaceView implements Runnable {
     private int score;
     private int direction = 1; // 1: up, 2: right, 3: down, 4: left
     private int currentDirection = 2; // default starting direction: right
+    private int speed = 200; // cang cao ran cang cham
 
     // Number of units in the grid
     private final int gridWidth = 15; // 15 units for width
@@ -37,6 +39,22 @@ public class GameView extends SurfaceView implements Runnable {
         snake.add(new SnakeSegments(6, 12));  // Body segment 1
         snake.add(new SnakeSegments(5, 12));  // Body segment 2
         generateApple();
+    }
+
+    public void setSpeed(String speed) {
+        switch (speed) {
+            case "slow":
+                this.speed = 300; // Slow speed
+                break;
+            case "medium":
+                this.speed = 200; // Medium speed (1.5x faster than slow)
+                break;
+            case "fast":
+                this.speed = 100; // Fast speed (2x faster than medium)
+                break;
+            default:
+                this.speed = 200; // Default to medium if not specified
+        }
     }
 
     private void generateApple() {
@@ -145,7 +163,7 @@ public class GameView extends SurfaceView implements Runnable {
 
     private void sleep() {
         try {
-            Thread.sleep(100);
+            Thread.sleep(speed); // Sleep duration based on speed
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
@@ -181,6 +199,7 @@ public class GameView extends SurfaceView implements Runnable {
         post(new Runnable() {
             @Override
             public void run() {
+                Toast.makeText(getContext(), "Game Over! Score: " + score, Toast.LENGTH_LONG).show();
                 // Implementing replay mechanism
                 ((PlayActivity) getContext()).showGameOverDialog(score);
             }
