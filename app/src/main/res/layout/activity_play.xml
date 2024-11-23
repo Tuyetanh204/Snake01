@@ -16,8 +16,8 @@
 
         <com.example.snake01.GameView
             android:id="@+id/gameView"
-            android:layout_width="300dp"
-            android:layout_height="500dp"
+            android:layout_width="600px"
+            android:layout_height="1000px"
             android:layout_centerInParent="true" />
     </RelativeLayout>
 

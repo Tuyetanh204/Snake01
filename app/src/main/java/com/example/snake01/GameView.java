@@ -7,7 +7,6 @@ import android.graphics.Paint;
 import android.util.AttributeSet;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
-import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.Random;
@@ -20,6 +19,7 @@ public class GameView extends SurfaceView implements Runnable {
     private ArrayList<SnakeSegments> snake;
     private SnakeSegments apple;
     private int score;
+    private int highScore;
     private int direction = 1; // 1: up, 2: right, 3: down, 4: left
     private int currentDirection = 2; // default starting direction: right
     private int speed = 200; // cang cao ran cang cham
@@ -34,6 +34,7 @@ public class GameView extends SurfaceView implements Runnable {
         paint = new Paint();
         surfaceHolder = getHolder();
         snake = new ArrayList<>();
+        //highScore = loadHighScore();
         // Initialize the snake with 3 segments
         snake.add(new SnakeSegments(7, 12));  // Head
         snake.add(new SnakeSegments(6, 12));  // Body segment 1
@@ -132,6 +133,10 @@ public class GameView extends SurfaceView implements Runnable {
         if (newX == apple.getPositionX() && newY == apple.getPositionY()) {
             generateApple();
             score++;
+            if (score > highScore) {
+                highScore = score;
+            }
+
         } else {
             // Remove the last segment if not eating
             snake.remove(snake.size() - 1);
@@ -156,6 +161,7 @@ public class GameView extends SurfaceView implements Runnable {
             paint.setColor(Color.WHITE);
             paint.setTextSize(35);
             canvas.drawText("Score: " + score, 20, 40, paint);
+            canvas.drawText("High Score: " + highScore, 20, 80, paint);
 
             surfaceHolder.unlockCanvasAndPost(canvas);
         }
@@ -199,7 +205,6 @@ public class GameView extends SurfaceView implements Runnable {
         post(new Runnable() {
             @Override
             public void run() {
-                Toast.makeText(getContext(), "Game Over! Score: " + score, Toast.LENGTH_LONG).show();
                 // Implementing replay mechanism
                 ((PlayActivity) getContext()).showGameOverDialog(score);
             }
@@ -215,5 +220,6 @@ public class GameView extends SurfaceView implements Runnable {
         generateApple();
         score = 0;
         currentDirection = 2; // Reset to initial direction
+        //highScore = loadHighScore();
     }
 }
