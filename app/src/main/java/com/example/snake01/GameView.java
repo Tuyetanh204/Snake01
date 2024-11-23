@@ -13,7 +13,7 @@ import java.util.Random;
 
 public class GameView extends SurfaceView implements Runnable {
     private Thread thread;
-    private boolean isPlaying;
+    private boolean isPlaying = true;
     private Paint paint;
     private SurfaceHolder surfaceHolder;
     private ArrayList<SnakeSegments> snake;
@@ -155,8 +155,12 @@ public class GameView extends SurfaceView implements Runnable {
             }
 
             paint.setColor(Color.RED);
-            canvas.drawRect(apple.getPositionX() * unitSize, apple.getPositionY() * unitSize,
-                    (apple.getPositionX() + 1) * unitSize, (apple.getPositionY() + 1) * unitSize, paint);
+            canvas.drawCircle(
+                    (apple.getPositionX() + 0.5f) * unitSize,
+                    (apple.getPositionY() + 0.5f) * unitSize,
+                    unitSize / 2,
+                    paint
+            );
 
             paint.setColor(Color.WHITE);
             paint.setTextSize(35);

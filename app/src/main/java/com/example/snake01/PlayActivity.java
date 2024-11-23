@@ -29,6 +29,7 @@ public class PlayActivity extends AppCompatActivity {
         ImageButton btnDown = findViewById(R.id.btnDown);
         ImageButton btnLeft = findViewById(R.id.btnLeft);
         ImageButton btnRight = findViewById(R.id.btnRight);
+        ImageButton btnPause = findViewById(R.id.btnPause);
 
         btnUp.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -57,6 +58,15 @@ public class PlayActivity extends AppCompatActivity {
                 gameView.setDirection(2);
             }
         });
+
+        btnPause.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                gameView.pause();
+                showPauseDialog();
+            }
+        });
+
     }
 
     @Override
@@ -92,6 +102,32 @@ public class PlayActivity extends AppCompatActivity {
                     }
                 })
                 .setIcon(android.R.drawable.ic_dialog_alert)
+                .setCancelable(false) // Cái này để lúc bấm ra ngoài nó không bị mất dialog
                 .show();
     }
+
+    public void showPauseDialog() {
+        new AlertDialog.Builder(this)
+                .setTitle("Game Paused")
+                .setMessage("Would u like to resume?")
+                .setPositiveButton("Resume", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        // Resume the game
+                        gameView.resume();
+                    }
+                })
+                .setNegativeButton("Exit to Main Menu", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        // Exit to main menu
+                        Intent intent = new Intent(PlayActivity.this, MainActivity.class);
+                        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+                        startActivity(intent);
+                        finish();
+                    }
+                })
+                .setIcon(android.R.drawable.ic_dialog_alert)
+                .setCancelable(false) // Cái này để lúc bấm ra ngoài nó không bị mất dialog
+                .show();
+    }
+
 }
