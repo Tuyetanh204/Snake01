@@ -6,6 +6,8 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.ImageButton;
+import android.widget.TextView;
+import android.os.CountDownTimer;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -112,11 +114,20 @@ public class PlayActivity extends AppCompatActivity {
                 .setMessage("Would u like to resume?")
                 .setPositiveButton("Resume", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int which) {
-                        // Resume the game
+                        // dem nguoc 3s -> resume()
+                        TextView tvCountDown = findViewById(R.id.tvCountDown);
+                        countDownAndResume(tvCountDown);
+                    }
+                })
+                .setNeutralButton("Restart", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        // restart
+                        gameView.resetGame();
                         gameView.resume();
                     }
                 })
-                .setNegativeButton("Exit to Main Menu", new DialogInterface.OnClickListener() {
+                .setNegativeButton("Main Menu", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int which) {
                         // Exit to main menu
                         Intent intent = new Intent(PlayActivity.this, MainActivity.class);
@@ -125,9 +136,30 @@ public class PlayActivity extends AppCompatActivity {
                         finish();
                     }
                 })
-                .setIcon(android.R.drawable.ic_dialog_alert)
+                .setIcon(android.R.drawable.ic_media_pause)
                 .setCancelable(false) // Cái này để lúc bấm ra ngoài nó không bị mất dialog
                 .show();
+    }
+
+    private void countDownAndResume(TextView tvCountDown) {
+        new CountDownTimer(3000, 1000) { // 3 giây (3000ms), đếm mỗi 1 giây (1000ms)
+
+            //onTick được gọi mỗi khi bộ đếm ngược giảm xuống (dựa trên tham số truyền vào CountDownTimer)
+            @Override
+            public void onTick(long millisUntilFinished) {
+                // Hiển thị số giây còn lại len màn hình
+                tvCountDown.setText(String.valueOf((int) millisUntilFinished / 1000));
+            }
+
+            //phương thức được gọi khi bộ đếm ngược kết thúc, tức là khi thgian còn lại = 0.
+            @Override
+            public void onFinish() {
+                // Resume the game
+                gameView.resume();
+                // Ẩn TextView sau khi đếm xonng
+                tvCountDown.setVisibility(View.GONE);
+            }
+        }.start();
     }
 
 }
