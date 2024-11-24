@@ -7,6 +7,12 @@ import android.graphics.Paint;
 import android.util.AttributeSet;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
+import android.widget.Toast;
+
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import static java.security.AccessController.getContext;
 
 import java.util.ArrayList;
 import java.util.Random;
@@ -19,7 +25,10 @@ public class GameView extends SurfaceView implements Runnable {
     private ArrayList<SnakeSegments> snake;
     private SnakeSegments apple;
     private int score;
-    private int highScore;
+
+    private int highScore = 0; // Lưu điểm cao nhất
+    private final String highScoreFileName = "highscore.txt"; // Tên file lưu điểm cao
+
     private int direction = 1; // 1: up, 2: right, 3: down, 4: left
     private int currentDirection = 2; // default starting direction: right
     private int speed = 200; // cang cao ran cang cham
@@ -34,11 +43,11 @@ public class GameView extends SurfaceView implements Runnable {
         paint = new Paint();
         surfaceHolder = getHolder();
         snake = new ArrayList<>();
-        //highScore = loadHighScore();
         // Initialize the snake with 3 segments
         snake.add(new SnakeSegments(7, 12));  // Head
         snake.add(new SnakeSegments(6, 12));  // Body segment 1
         snake.add(new SnakeSegments(5, 12));  // Body segment 2
+        highScore = loadHighScore();
         generateApple();
     }
 
@@ -135,7 +144,9 @@ public class GameView extends SurfaceView implements Runnable {
             score++;
             if (score > highScore) {
                 highScore = score;
+                saveHighScore(); // Lưu điểm cao mới vào file
             }
+
 
         } else {
             // Remove the last segment if not eating
@@ -209,11 +220,12 @@ public class GameView extends SurfaceView implements Runnable {
         post(new Runnable() {
             @Override
             public void run() {
-                // Implementing replay mechanism
+                Toast.makeText(getContext(), "Game Over! Score: " + score + " | High Score: " + highScore, Toast.LENGTH_LONG).show();
                 ((PlayActivity) getContext()).showGameOverDialog(score);
             }
         });
     }
+
 
     public void resetGame() {
         snake.clear();
@@ -224,6 +236,32 @@ public class GameView extends SurfaceView implements Runnable {
         generateApple();
         score = 0;
         currentDirection = 2; // Reset to initial direction
-        //highScore = loadHighScore();
+        highScore = loadHighScore();
+    }
+    private void saveHighScore() {
+        try {
+            FileOutputStream fos = getContext().openFileOutput(highScoreFileName, Context.MODE_PRIVATE);
+            fos.write(String.valueOf(highScore).getBytes());
+            fos.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private int loadHighScore() {
+        try {
+            FileInputStream fis = getContext().openFileInput(highScoreFileName);
+            byte[] data = new byte[fis.available()];
+            fis.read(data);
+            fis.close();
+            return Integer.parseInt(new String(data));
+        } catch (IOException | NumberFormatException e) {
+            e.printStackTrace();
+            return 0;
+        }
+    }
+    public int getHighScore() {
+        return highScore;
     }
 }
+

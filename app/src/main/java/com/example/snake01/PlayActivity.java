@@ -1,8 +1,10 @@
 package com.example.snake01;
 
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.ImageButton;
@@ -10,6 +12,9 @@ import android.widget.TextView;
 import android.os.CountDownTimer;
 
 import androidx.appcompat.app.AppCompatActivity;
+
+import java.io.FileOutputStream;
+import java.io.IOException;
 
 public class PlayActivity extends AppCompatActivity {
     private GameView gameView;
@@ -19,6 +24,9 @@ public class PlayActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_play);
+
+        SharedPreferences preferences = getSharedPreferences("game_data", MODE_PRIVATE);
+        int highScore = preferences.getInt("high_score", 0); // Mặc định là 0 nếu không có giá trị
 
         Intent intent = getIntent();
         speed = intent.getStringExtra("speed");
@@ -83,31 +91,6 @@ public class PlayActivity extends AppCompatActivity {
         gameView.pause();
     }
 
-    public void showGameOverDialog(int score) {
-        new AlertDialog.Builder(this)
-                .setTitle("Game Over")
-                .setMessage("Score: " + score)
-                .setPositiveButton("Replay", new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int which) {
-                        // Reset and restart the game
-                        gameView.resetGame();
-                        gameView.resume();
-                    }
-                })
-                .setNegativeButton("Exit to Main Menu", new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int which) {
-                        // Exit to main menu
-                        Intent intent = new Intent(PlayActivity.this, MainActivity.class);
-                        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
-                        startActivity(intent);
-                        finish();
-                    }
-                })
-                .setIcon(android.R.drawable.ic_dialog_alert)
-                .setCancelable(false) // Cái này để lúc bấm ra ngoài nó không bị mất dialog
-                .show();
-    }
-
     public void showPauseDialog() {
         new AlertDialog.Builder(this)
                 .setTitle("Game Paused")
@@ -164,5 +147,46 @@ public class PlayActivity extends AppCompatActivity {
             }
         }.start();
     }
+    // Trong PlayActivity, khi game over
+    public void showGameOverDialog(int score) {
+        int highScore = gameView.getHighScore(); // Lấy điểm cao từ GameView
 
+        // Kiểm tra nếu điểm vừa chơi lớn hơn điểm cao đã lưu
+        SharedPreferences preferences = getSharedPreferences("game_data", MODE_PRIVATE);
+        SharedPreferences.Editor editor = preferences.edit();
+        int savedHighScore = preferences.getInt("high_score", 0); // Lấy điểm cao hiện tại
+
+        if (score > savedHighScore) {
+            editor.putInt("high_score", score);  // Lưu lại điểm cao mới nếu lớn hơn
+            editor.apply();
+        }
+
+        new AlertDialog.Builder(this)
+                .setTitle("Game Over")
+                .setMessage("Score: " + score)
+                .setPositiveButton("Replay", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        gameView.resetGame();
+                        gameView.resume();
+                    }
+                })
+                .setNegativeButton("Exit to Main Menu", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        // Chuyển về MainActivity
+                        Intent intent = new Intent(PlayActivity.this, MainActivity.class);
+                        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+                        startActivity(intent);
+                        finish();
+                    }
+                })
+                .setIcon(android.R.drawable.ic_dialog_alert)
+                .setCancelable(false)
+                .show();
+    }
+    private void saveHighScore(int score) {
+        SharedPreferences preferences = getSharedPreferences("game_data", MODE_PRIVATE);
+        SharedPreferences.Editor editor = preferences.edit();
+        editor.putInt("high_score", score);
+        editor.apply();  // Hoặc editor.commit(); để lưu thay đổi
+    }
 }

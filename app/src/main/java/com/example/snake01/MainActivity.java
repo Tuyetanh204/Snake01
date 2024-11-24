@@ -3,11 +3,15 @@ package com.example.snake01;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 
 import androidx.appcompat.app.AppCompatActivity;
+
+import java.io.FileInputStream;
+import java.io.IOException;
 
 public class MainActivity extends AppCompatActivity {
     private static final int SPEED_REQUEST_CODE = 1;
@@ -17,6 +21,10 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        // Lấy điểm cao từ SharedPreferences
+        SharedPreferences preferences = getSharedPreferences("game_data", MODE_PRIVATE);
+        int highScore = preferences.getInt("high_score", 0);// Mặc định là 0 nếu không có giá trị
 
         Button playButton = findViewById(R.id.Play);
         playButton.setOnClickListener(new View.OnClickListener() {
@@ -28,7 +36,7 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        Button speedButton = findViewById(R.id.Speed);
+    Button speedButton = findViewById(R.id.Speed);
         speedButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -43,6 +51,12 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View v) {
                 showExitConfirmationDialog();
             }
+        });
+        Button highScoreButton = findViewById(R.id.HiScore);
+        highScoreButton.setOnClickListener(new View.OnClickListener() {
+            @Override public void onClick(View v) {
+                showHighScoreDialog(highScore); // Hiển thị điểm cao
+                }
         });
     }
 
@@ -66,5 +80,25 @@ public class MainActivity extends AppCompatActivity {
                 .setNegativeButton("No", null)
                 .setIcon(android.R.drawable.ic_dialog_alert)
                 .show();
+    }
+private void showHighScoreDialog(int highScore) {
+    new AlertDialog.Builder(this)
+            .setTitle("High Score")
+            .setMessage("Your High Score: " + highScore)
+            .setPositiveButton("OK", null)
+            .setIcon(android.R.drawable.ic_dialog_info)
+            .show();
+    }
+    private int loadHighScore() {
+        try {
+            FileInputStream fis = openFileInput("highscore.txt");
+            byte[] data = new byte[fis.available()];
+            fis.read(data);
+            fis.close();
+            return Integer.parseInt(new String(data));
+        } catch (IOException | NumberFormatException e) {
+            e.printStackTrace();
+            return 0;
+        }
     }
 }
