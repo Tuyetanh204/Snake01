@@ -142,6 +142,9 @@ public class PlayActivity extends AppCompatActivity {
     }
 
     private void countDownAndResume(TextView tvCountDown) {
+        // Đặt lại TextView thành VISIBLE, k lần sau lại đ hiện tv nữa
+        tvCountDown.setVisibility(View.VISIBLE);
+
         new CountDownTimer(3000, 1000) { // 3 giây (3000ms), đếm mỗi 1 giây (1000ms)
 
             //onTick được gọi mỗi khi bộ đếm ngược giảm xuống (dựa trên tham số truyền vào CountDownTimer)
