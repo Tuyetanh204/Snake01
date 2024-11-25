@@ -12,8 +12,6 @@ import android.widget.Toast;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import static java.security.AccessController.getContext;
-
 import java.util.ArrayList;
 import java.util.Random;
 
@@ -43,6 +41,7 @@ public class GameView extends SurfaceView implements Runnable {
         paint = new Paint();
         surfaceHolder = getHolder();
         snake = new ArrayList<>();
+
         // Initialize the snake with 3 segments
         snake.add(new SnakeSegments(7, 12));  // Head
         snake.add(new SnakeSegments(6, 12));  // Body segment 1
@@ -147,7 +146,6 @@ public class GameView extends SurfaceView implements Runnable {
                 saveHighScore(); // Lưu điểm cao mới vào file
             }
 
-
         } else {
             // Remove the last segment if not eating
             snake.remove(snake.size() - 1);
@@ -238,7 +236,8 @@ public class GameView extends SurfaceView implements Runnable {
         currentDirection = 2; // Reset to initial direction
         highScore = loadHighScore();
     }
-    private void saveHighScore() {
+
+    public void saveHighScore() {
         try {
             FileOutputStream fos = getContext().openFileOutput(highScoreFileName, Context.MODE_PRIVATE);
             fos.write(String.valueOf(highScore).getBytes());
@@ -260,8 +259,8 @@ public class GameView extends SurfaceView implements Runnable {
             return 0;
         }
     }
+
     public int getHighScore() {
         return highScore;
     }
 }
-
