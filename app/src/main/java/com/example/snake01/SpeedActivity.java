@@ -6,16 +6,19 @@ import android.os.Handler;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.content.SharedPreferences;
 
 import androidx.appcompat.app.AppCompatActivity;
 
 public class SpeedActivity extends AppCompatActivity {
     private Handler handler = new Handler();
+    private SharedPreferences sharedPreferences;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_speed);
+        sharedPreferences = getSharedPreferences("game_prefs", MODE_PRIVATE);
 
         Button btnSlow = findViewById(R.id.btnSlow);
         Button btnMedium = findViewById(R.id.btnMedium);
@@ -53,9 +56,7 @@ public class SpeedActivity extends AppCompatActivity {
     }
 
     private void setupPreviewAnimation(final ImageView preview, final int duration) {
-        final int distance = 300; // Khoảng cách di chuyển (px)
-
-        // Tạo các runnable ngoài để đảm bảo chúng được khởi tạo đúng cách
+        final int distance = 300; //px
         final Runnable[] moveRight = new Runnable[1];
         final Runnable[] moveLeft = new Runnable[1];
 
@@ -65,19 +66,23 @@ public class SpeedActivity extends AppCompatActivity {
                 preview.animate().translationXBy(distance).setDuration(duration).withEndAction(moveLeft[0]);
             }
         };
-
         moveLeft[0] = new Runnable() {
             @Override
             public void run() {
                 preview.animate().translationXBy(-distance).setDuration(duration).withEndAction(moveRight[0]);
             }
         };
-
         // Bắt đầu chuyển động
         handler.post(moveRight[0]);
     }
 
     private void setSpeed(String speed) {
+        // Lưu lại tốc độ đã chọn
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putString("speed", speed);
+        editor.apply();
+
+        // Trở về màn hình chính
         Intent intent = new Intent();
         intent.putExtra("speed", speed);
         setResult(RESULT_OK, intent);

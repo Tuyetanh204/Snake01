@@ -28,13 +28,13 @@ public class GameView extends SurfaceView implements Runnable {
     private final String highScoreFileName = "highscore.txt"; // Tên file lưu điểm cao
 
     private int direction = 1; // 1: up, 2: right, 3: down, 4: left
-    private int currentDirection = 2; // default starting direction: right
-    private int speed = 200; // cang cao ran cang cham
+    private int currentDirection = 2; // default: right
+    private int speed = 200; // higher=slower
 
     // Number of units in the grid
-    private final int gridWidth = 15; // 15 units for width
-    private final int gridHeight = 25; // 25 units for height
-    private final int unitSize = 40; // Each unit is 40dp
+    private final int gridWidth = 14;
+    private final int gridHeight = 21;
+    private final int unitSize = 50;
 
     public GameView(Context context, AttributeSet attrs) {
         super(context, attrs);
@@ -133,11 +133,11 @@ public class GameView extends SurfaceView implements Runnable {
             }
         }
 
-        // Move the head to the new position
+        // Move the head, newX,Y__above
         SnakeSegments newHead = new SnakeSegments(newX, newY);
         snake.add(0, newHead);
 
-        // Check if the head has eaten the apple
+        // Check: head = apple?
         if (newX == apple.getPositionX() && newY == apple.getPositionY()) {
             generateApple();
             score++;
@@ -156,13 +156,13 @@ public class GameView extends SurfaceView implements Runnable {
         if (surfaceHolder.getSurface().isValid()) {
             Canvas canvas = surfaceHolder.lockCanvas();
             canvas.drawColor(Color.BLACK);
-
+//snake
             paint.setColor(Color.GREEN);
             for (SnakeSegments segment : snake) {
                 canvas.drawRect(segment.getPositionX() * unitSize, segment.getPositionY() * unitSize,
                         (segment.getPositionX() + 1) * unitSize, (segment.getPositionY() + 1) * unitSize, paint);
             }
-
+//apple
             paint.setColor(Color.RED);
             canvas.drawCircle(
                     (apple.getPositionX() + 0.5f) * unitSize,
@@ -170,9 +170,9 @@ public class GameView extends SurfaceView implements Runnable {
                     unitSize / 2,
                     paint
             );
-
+//text: score, high score
             paint.setColor(Color.WHITE);
-            paint.setTextSize(35);
+            paint.setTextSize(42);
             canvas.drawText("Score: " + score, 20, 40, paint);
             canvas.drawText("High Score: " + highScore, 20, 80, paint);
 
@@ -202,7 +202,7 @@ public class GameView extends SurfaceView implements Runnable {
             e.printStackTrace();
         }
     }
-
+// Button to control snake use
     public void setDirection(int newDirection) {
         // Prevent the snake from turning 180 degrees
         if ((currentDirection == 1 && newDirection == 3) || // Up to Down
